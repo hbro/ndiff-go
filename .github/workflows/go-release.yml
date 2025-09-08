@@ -48,7 +48,7 @@ jobs:
           go build -o $BINARY_NAME -ldflags "-X 'main.version=$VERSION'"
 
           # Move the binary to the root directory for easy access
-          mv $BINARY_NAME .
+          # mv $BINARY_NAME .
 
       - name: Upload binaries to release
         uses: softprops/action-gh-release@v1
