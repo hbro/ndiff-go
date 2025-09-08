@@ -57,5 +57,6 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.version_tag || github.ref_name }}
           files: ndiff-go*
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
