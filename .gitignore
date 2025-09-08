@@ -1,0 +1,44 @@
+# Compiled binary
+ndiff-go
+ndiff
+
+# Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go coverage
+*.coverprofile
+coverage.txt
+
+# Dependency directories
+vendor/
+
+# IDE directories
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test scan files (may contain sensitive network info)
+*.xml
+!test-scans/*.xml
+
+# Credentials and sensitive files
+*.key
+*.pem
+*.crt
+.env
+.env.local
+credentials.txt
+secrets.txt
+config.secret.*
