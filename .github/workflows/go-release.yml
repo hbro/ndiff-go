@@ -4,6 +4,13 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'The version tag to build (e.g., v1.0.0)'
+        required: true
+        type: string
 
 jobs:
   build-and-release:
@@ -34,17 +41,19 @@ jobs:
           if [ "$GOOS" == "windows" ]; then
             BINARY_NAME+=".exe"
           fi
-
-          # Use go build with ldflags to set the version from the git tag
-          go build -o $BINARY_NAME -ldflags "-X 'main.version=${{ github.ref_name }}'"
+          
+          # Use the version from the workflow input for manual runs, or the git ref for pushes
+          VERSION=${{ github.event.inputs.version_tag || github.ref_name }}
+          
+          go build -o $BINARY_NAME -ldflags "-X 'main.version=$VERSION'"
 
           # Move the binary to the root directory for easy access
           mv $BINARY_NAME .
 
       - name: Upload binaries to release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
         with:
+          tag_name: ${{ github.event.inputs.version_tag || github.ref_name }}
           files: ndiff-go*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
