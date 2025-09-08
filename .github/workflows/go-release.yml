@@ -34,6 +34,7 @@ jobs:
           go-version: '1.23.8'
 
       - name: Build
+        shell: bash
         env:
           GOOS: ${{ (matrix.os == 'ubuntu-latest' && 'linux') || (matrix.os == 'windows-latest' && 'windows') }}
           GOARCH: ${{ matrix.goarch }}
