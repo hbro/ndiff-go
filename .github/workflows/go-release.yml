@@ -1,0 +1,50 @@
+name: Go Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        goarch: [amd64, arm64]
+        exclude:
+          - os: windows-latest
+            goarch: arm64 # Windows on ARM is currently not widely used for this type of application, so we can exclude it to save build time.
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Build
+        env:
+          GOOS: ${{ (matrix.os == 'ubuntu-latest' && 'linux') || (matrix.os == 'windows-latest' && 'windows') }}
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          # Define the output filename based on OS and architecture
+          BINARY_NAME="ndiff-go-${{ env.GOOS }}-${{ env.GOARCH }}"
+          if [ "$GOOS" == "windows" ]; then
+            BINARY_NAME+=".exe"
+          fi
+
+          # Use go build with ldflags to set the version from the git tag
+          go build -o $BINARY_NAME -ldflags "-X 'main.version=${{ github.ref_name }}'"
+
+          # Move the binary to the root directory for easy access
+          mv $BINARY_NAME .
+
+      - name: Upload binaries to release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ndiff-go*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
